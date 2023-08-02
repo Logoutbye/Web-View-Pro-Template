@@ -1,16 +1,9 @@
-# ezeehome_webview
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+please donot push your local changes to this repo
+and if you wish to add this existing repo after local changes to new repo follow the steps below:
+1. git remote -v  "to check the git repository"
+2. git remote remove origin "to remove the git repository"
+4. git remote -v  "to check the git repository"
+5. git init 
+6. git remote add origin <remote_url> 
+7. git commit -am "commit message" 
+8. git push origin master or main
