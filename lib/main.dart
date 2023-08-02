@@ -1,12 +1,11 @@
-import 'package:ezeehome_webview/Controllers/InternetConnectivity.dart';
 import 'package:ezeehome_webview/Controllers/initlize_app.dart';
 import 'package:ezeehome_webview/Screens/Home.dart';
 import 'package:ezeehome_webview/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'chnages.dart';
 
-//test commit
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

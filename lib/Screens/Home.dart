@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Controllers/errors_handling.dart';
+import '../chnages.dart';
 
 class Home extends StatefulWidget {
   Home({
