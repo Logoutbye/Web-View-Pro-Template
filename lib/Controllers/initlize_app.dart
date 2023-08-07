@@ -7,7 +7,7 @@ class InitilizeApp {
   //check Internet
   static callFunctions() async {
     //this function checks internet
-    await CheckInternetConnection.checkInternetFunction();
+    // await CheckInternetConnection.checkInternetFunction();
     // this function snippet enables web contents debugging for the in-app web view on Android
     initializeWebViewFeatures();
     requestPermissions();

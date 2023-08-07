@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../Controllers/InternetConnectivity.dart';
 import '../Controllers/errors_handling.dart';
 import '../chnages.dart';
 
@@ -29,9 +30,9 @@ class _HomeState extends State<Home> {
 
   double _progress = 0.0; // Variable to hold the progress percentage
 
-  bool _isLoading =
-      true; // loading animation or whatever widget called in the Visible widget
+  // bool _isLoading = true;
 
+  bool _startEndLoading = false;
   // FacebookBannerAd? facebookBannerAd;
   // bool _isInterstitialAdLoaded = false;
 
@@ -41,7 +42,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-
+    CheckInternetConnection.checkInternetFunction();
     pullToRefreshController = PullToRefreshController(
       options: PullToRefreshOptions(
         color: Colors.black,
@@ -124,11 +125,13 @@ class _HomeState extends State<Home> {
               onLoadStart: (controller, url) {
                 setState(() {
                   Changes.mainUrl = url?.toString() ?? '';
+                  _startEndLoading = true;
                 });
               },
               onLoadStop: (controller, url) async {
                 setState(() {
                   Changes.mainUrl = url?.toString() ?? '';
+                  _startEndLoading = false;
                 });
               },
               onProgressChanged: (controller, progress) {
@@ -136,11 +139,11 @@ class _HomeState extends State<Home> {
                   _progress = progress / 100;
 
                   // _progressText = progress;  // to show inside of loading
-                  if (_progress > 0.8) {
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  }
+                  // if (_progress > 0.8) {
+                  //   setState(() {
+                  //     _isLoading = false;
+                  //   });
+                  // }
                 });
               },
               onLoadError: (controller, url, code, message) {
@@ -211,31 +214,45 @@ class _HomeState extends State<Home> {
                 }
               },
             ),
-            Visibility(
-              visible:
-                  _isLoading, // Show the progress indicator only when loading
-              child: Center(
-                  child: Padding(
-                padding: const EdgeInsets.all(58.0),
-                child: Lottie.asset('assets/images/loading2.json', width: 500),
-              )
-                  // CircularPercentIndicator(
-                  //   radius: 80.0,
-                  //   lineWidth: 15.0,
-                  //   percent: _progress,
-                  //   center: new Text(
-                  //     "$_progressText%",
-                  //     style: TextStyle(
-                  //         color: Color.fromARGB(255, 7, 7, 7), fontSize: 40),
-                  //   ),
-                  //   progressColor: MyColors.kprimaryColor,
-                  //   backgroundColor: Color.fromARGB(255, 104, 204, 247),
-                  //   circularStrokeCap: CircularStrokeCap.round,
-                  // ),
-
+            Positioned.fill(
+              child: Visibility(
+                visible: _startEndLoading,
+                child: Container(
+                  color: MyColors.kmainColor,
+                  child: Center(
+                    child: Lottie.asset(
+                      'assets/images/loading.json',
+                    ),
                   ),
-              //  CircularProgressIndicator(value: _progress),
+                ),
+              ),
             ),
+            // Visibility(
+            //   visible:
+            //       _isLoading, // Show the progress indicator only when loading
+            //   child: Center(
+            //       child: Padding(
+            //     padding: const EdgeInsets.all(58.0),
+            //     child: Lottie.asset('assets/images/loading2.json', width: 500),
+            //   )
+            //       // CircularPercentIndicator(
+            //       //   radius: 80.0,
+            //       //   lineWidth: 15.0,
+            //       //   percent: _progress,
+            //       //   center: new Text(
+            //       //     "$_progressText%",
+            //       //     style: TextStyle(
+            //       //         color: Color.fromARGB(255, 7, 7, 7), fontSize: 40),
+            //       //   ),
+            //       //   progressColor: MyColors.kprimaryColor,
+            //       //   backgroundColor: Color.fromARGB(255, 104, 204, 247),
+            //       //   circularStrokeCap: CircularStrokeCap.round,
+            //       // ),
+
+            //       ),
+            //   //  CircularProgressIndicator(value: _progress),
+            // ),
+       
           ],
         ),
 
