@@ -2,7 +2,7 @@
     package="com.example.ezeehome_webview">
     <!-- Other manifest declarations -->
    <uses-permission android:name="android.permission.INTERNET"/>
-   <uses-permission android:name="android.permission.CALL_PHONE"/>
+   <!-- <uses-permission android:name="android.permission.CALL_PHONE"/> -->
    <queries>
     <!-- If your app checks for SMS support -->
     <intent>

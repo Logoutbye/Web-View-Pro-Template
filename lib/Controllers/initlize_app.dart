@@ -10,6 +10,6 @@ class InitilizeApp {
     // await CheckInternetConnection.checkInternetFunction();
     // this function snippet enables web contents debugging for the in-app web view on Android
     initializeWebViewFeatures();
-    requestPermissions();
+    // requestPermissions();
   }
 }

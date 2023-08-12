@@ -6,4 +6,4 @@ and if you wish to add this existing repo after local changes to new repo follow
 5. git init 
 6. git remote add origin <remote_url> 
 7. git commit -am "commit message" 
-8. git push origin master or main
+8. git push origin master 

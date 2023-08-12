@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:ezeehome_webview/Controllers/InternetConnectivity.dart';
 import 'package:ezeehome_webview/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../Controllers/InternetConnectivity.dart';
 import '../Controllers/errors_handling.dart';
 import '../chnages.dart';
+import '../main.dart';
 
 class Home extends StatefulWidget {
   Home({
@@ -24,28 +27,27 @@ class _HomeState extends State<Home> {
   late InAppWebViewController _webViewController;
   late PullToRefreshController pullToRefreshController;
   final InAppBrowser browser = InAppBrowser();
+  double _progress = 0.0; // Variable to hold the progress percentage
+  bool hasGeolocationPermission = false;
+  bool _isLoading =
+      true; // loading animation or whatever widget called in the Visible widget
+
+  // FacebookBannerAd? facebookBannerAd;
+  // bool _isInterstitialAdLoaded = false;
+  // late BannerAd _bannerGoogleAd;
+  // InterstitialAd? _interstialGoogleAd;
   //for loading progress
   // double? progress;
   // bool loader = false;
-
-  double _progress = 0.0; // Variable to hold the progress percentage
-
-  // bool _isLoading = true;
-
-  bool _startEndLoading = false;
-  // FacebookBannerAd? facebookBannerAd;
-  // bool _isInterstitialAdLoaded = false;
-
-  // late BannerAd _bannerGoogleAd;
-  // InterstitialAd? _interstialGoogleAd;
 
   @override
   void initState() {
     super.initState();
     CheckInternetConnection.checkInternetFunction();
+
     pullToRefreshController = PullToRefreshController(
       options: PullToRefreshOptions(
-        color: Colors.black,
+        color: MyColors.kprimaryColor,
       ),
       onRefresh: () async {
         if (Platform.isAndroid) {
@@ -65,7 +67,6 @@ class _HomeState extends State<Home> {
     //     //testingId: "a77955ee-3304-4635-be65-81029b0f5201", //optional
     //     iOSAdvertiserTrackingEnabled: true //default false
     //     );
-
     //Load Google Ads
     // _createGoogleBannerAd();
     // _createGoogleInterstitialAd();
@@ -73,6 +74,12 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey _loaderKey = GlobalKey();
+    double baseSize = 55.0;
+    double scaleFactor = MediaQuery.of(context).size.shortestSide /
+        360; // Adjust the divisor as needed
+    double containerSize = baseSize * scaleFactor;
+
     return WillPopScope(
       onWillPop: () async {
         // Check if the current URL is the specified URL
@@ -122,22 +129,22 @@ class _HomeState extends State<Home> {
               onWebViewCreated: (controller) {
                 _webViewController = controller;
               },
+
               onLoadStart: (controller, url) {
                 setState(() {
                   Changes.mainUrl = url?.toString() ?? '';
-                  _startEndLoading = true;
+                  _isLoading = true;
                 });
               },
               onLoadStop: (controller, url) async {
                 setState(() {
                   Changes.mainUrl = url?.toString() ?? '';
-                  _startEndLoading = false;
+                  _isLoading = false;
                 });
               },
               onProgressChanged: (controller, progress) {
                 setState(() {
                   _progress = progress / 100;
-
                   // _progressText = progress;  // to show inside of loading
                   // if (_progress > 0.8) {
                   //   setState(() {
@@ -150,12 +157,12 @@ class _HomeState extends State<Home> {
                 if (kDebugMode) {
                   print(':::url: $url mesage $message code $code $message');
                 }
+                Navigator.pop(context);
                 handleErrorCode(code, context);
                 // Handle web page load errors here
               },
               pullToRefreshController: PullToRefreshController(
-                  options:
-                      PullToRefreshOptions(color: MyColors.ksecondaryColor),
+                  options: PullToRefreshOptions(color: MyColors.kprimaryColor),
                   onRefresh: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(MaterialPageRoute(
@@ -180,26 +187,92 @@ class _HomeState extends State<Home> {
                       .GRANT, // Grant camera permission
                 );
               },
+
+              // Track if the website already asked for geolocation permission
+
+              androidOnGeolocationPermissionsShowPrompt:
+                  (controller, origin) async {
+                if (hasGeolocationPermission) {
+                  // The website already asked for geolocation permission, show the website's prompt
+                  return GeolocationPermissionShowPromptResponse(
+                      origin: origin, allow: true, retain: true);
+                } else {
+                  // The website is asking for geolocation permission for the first time, show the app's prompt
+                  var status = await Permission.locationWhenInUse.request();
+                  if (status.isGranted) {
+                    hasGeolocationPermission =
+                        true; // Remember that the website asked for geolocation permission
+                    return GeolocationPermissionShowPromptResponse(
+                        origin: origin, allow: true, retain: true);
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Location Permission Required'),
+                        content: Text(
+                            'This app needs access to your location to show it on the map.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              hasGeolocationPermission =
+                                  false; // Reset the permission status on cancel
+                              controller.evaluateJavascript(
+                                source:
+                                    'navigator.geolocation.getCurrentPosition = function(success, error) { error({code: 1}); };',
+                              );
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              hasGeolocationPermission =
+                                  true; // Remember that the website asked for geolocation permission
+                              Geolocator
+                                  .openAppSettings(); // Redirect the user to app settings to manually enable location permission
+                            },
+                            child: Text('Open Settings'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return GeolocationPermissionShowPromptResponse(
+                        origin: origin, allow: false, retain: true);
+                  }
+                }
+              },
+
               shouldOverrideUrlLoading: (controller, navigationAction) async {
+                setState(() {
+                  _isLoading = true;
+                });
+
+                _loaderKey.currentState?.setState(() {
+                  // This is to trigger a rebuild of the loader widget
+                });
                 var uri = navigationAction.request.url;
                 if (uri!.toString().startsWith(Changes.startPointUrl)) {
                   return NavigationActionPolicy.ALLOW;
-                } else if (uri
-                    .toString()
-                    .startsWith(Changes.makePhoneCallUrl)) {
+                } else if (uri.toString().startsWith(Changes.makePhoneCallUrl)) {
                   if (kDebugMode) {
-                    print('::: opening phone $uri');
+                    print('opening phone $uri');
                   }
                   _makePhoneCall(uri.toString());
+                  setState(() {
+                    _isLoading=false;
+                  });
                   return NavigationActionPolicy.CANCEL;
                 } else if (uri.toString().startsWith(Changes.openWhatsAppUrl)) {
                   if (kDebugMode) {
                     print('opening WhatsApp $uri');
                   }
-                  // _openWhatsApp('$uri');
-                } else if (uri
-                    .toString()
-                    .startsWith(Changes.blockNavigationUrl)) {
+                  _openWhatsApp('$uri');
+                   setState(() {
+                    _isLoading=false;
+                  });
+                  return NavigationActionPolicy.CANCEL;
+                } else if (uri.toString().startsWith(Changes.blockNavigationUrl)) {
                   if (kDebugMode) {
                     print('Blocking navigation to $uri');
                   }
@@ -208,51 +281,51 @@ class _HomeState extends State<Home> {
                   if (kDebugMode) {
                     print('Opening else link: $uri');
                   }
+                  setState(() {
+                    _isLoading = false;
+                  });
                   _launchExternalUrl(uri.toString());
                   // You can handle other links here and decide how to navigate to them
                   return NavigationActionPolicy.CANCEL;
+                  // if (uri.toString() ==
+                  //     'https://m.facebook.com/oauth/error/?error_code=PLATFORM__LOGIN_DISABLED_FROM_WEBVIEW_OLD_SDK_VERSION&display=touch') {
+                  //   return NavigationActionPolicy.CANCEL;
+                  // } else {
+                  //   return NavigationActionPolicy.ALLOW;
+                  // }
                 }
               },
             ),
             Positioned.fill(
               child: Visibility(
-                visible: _startEndLoading,
+                visible: _isLoading,
                 child: Container(
-                  color: MyColors.kmainColor,
+                  // color: Colors.transparent,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    // Colors.white.withOpacity(
+                    //     0.7), // Set the white color with transparency for blur effect
+                    borderRadius: BorderRadius.circular(20),
+                  ), // Set kmainColor with transparency
                   child: Center(
-                    child: Lottie.asset(
-                      'assets/images/loading.json',
+                    child: Container(
+                      // width: 60,
+                      // height:60,
+                      width: containerSize,
+                      height: containerSize,
+                      decoration: BoxDecoration(
+                        color: MyColors.kmainColor,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Center(
+                        child: Lottie.asset('assets/images/loading.json',
+                            fit: BoxFit.fill),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-            // Visibility(
-            //   visible:
-            //       _isLoading, // Show the progress indicator only when loading
-            //   child: Center(
-            //       child: Padding(
-            //     padding: const EdgeInsets.all(58.0),
-            //     child: Lottie.asset('assets/images/loading2.json', width: 500),
-            //   )
-            //       // CircularPercentIndicator(
-            //       //   radius: 80.0,
-            //       //   lineWidth: 15.0,
-            //       //   percent: _progress,
-            //       //   center: new Text(
-            //       //     "$_progressText%",
-            //       //     style: TextStyle(
-            //       //         color: Color.fromARGB(255, 7, 7, 7), fontSize: 40),
-            //       //   ),
-            //       //   progressColor: MyColors.kprimaryColor,
-            //       //   backgroundColor: Color.fromARGB(255, 104, 204, 247),
-            //       //   circularStrokeCap: CircularStrokeCap.round,
-            //       // ),
-
-            //       ),
-            //   //  CircularProgressIndicator(value: _progress),
-            // ),
-       
           ],
         ),
 
@@ -265,7 +338,6 @@ class _HomeState extends State<Home> {
         //         child: AdWidget(ad: _bannerGoogleAd),
         //       )
         //     : SizedBox(),
-
         //for facebook ads
         // bottomNavigationBar: Container(
         //   child: facebookBannerAd,
@@ -283,7 +355,6 @@ class _HomeState extends State<Home> {
 //         request: AdRequest())
 //       ..load();
 //   }
-
 // // call this in init so you can create it
 //   void _createGoogleInterstitialAd() {
 //     InterstitialAd.load(
@@ -294,7 +365,6 @@ class _HomeState extends State<Home> {
 //             onAdFailedToLoad: (LoadAdError loadAdError) =>
 //                 _interstialGoogleAd = null));
 //   }
-
 // // call this to show where every in the app you want to show google interstitalAd
 //   void _showGoogleInterstitalAd() {
 //     if (_interstialGoogleAd != null) {
@@ -355,7 +425,6 @@ class _HomeState extends State<Home> {
   //     },
   //   );
   // }
-
   // void _loadInterstitialAd() {
   //   FacebookInterstitialAd.loadInterstitialAd(
   //     // placementId: "YOUR_PLACEMENT_ID",
