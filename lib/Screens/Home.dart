@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
 
     pullToRefreshController = PullToRefreshController(
       options: PullToRefreshOptions(
-        color: MyColors.kprimaryColor,
+        color: MyColors.kmainColor,
       ),
       onRefresh: () async {
         if (Platform.isAndroid) {
@@ -162,7 +162,7 @@ class _HomeState extends State<Home> {
                 // Handle web page load errors here
               },
               pullToRefreshController: PullToRefreshController(
-                  options: PullToRefreshOptions(color: MyColors.kprimaryColor),
+                  options: PullToRefreshOptions(color: MyColors.kmainColor),
                   onRefresh: () {
                     Navigator.pop(context);
                     Navigator.of(context).push(MaterialPageRoute(
@@ -296,36 +296,13 @@ class _HomeState extends State<Home> {
                 }
               },
             ),
-            Positioned.fill(
-              child: Visibility(
-                visible: _isLoading,
-                child: Container(
-                  // color: Colors.transparent,
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    // Colors.white.withOpacity(
-                    //     0.7), // Set the white color with transparency for blur effect
-                    borderRadius: BorderRadius.circular(20),
-                  ), // Set kmainColor with transparency
-                  child: Center(
-                    child: Container(
-                      // width: 60,
-                      // height:60,
-                      width: containerSize,
-                      height: containerSize,
-                      decoration: BoxDecoration(
-                        color: MyColors.kmainColor,
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Center(
-                        child: Lottie.asset('assets/images/loading.json',
-                            fit: BoxFit.fill),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // Positioned.fill(
+            //   child: Visibility(
+            //     visible: _isLoading,
+            //     child: Lottie.asset('assets/images/loading2.json',
+            //         fit: BoxFit.fill),
+            //   ),
+            // ),
           ],
         ),
 

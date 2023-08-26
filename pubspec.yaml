@@ -55,6 +55,7 @@ dependencies:
   flutter_launcher_icons: ^0.11.0
   # flutter_native_splash: ^2.2.17
   rename: ^2.1.1
+  # onesignal_flutter: ^3.5.1
 
 dev_dependencies:
   flutter_test:
