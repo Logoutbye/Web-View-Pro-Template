@@ -41,20 +41,20 @@ dependencies:
   # flutter_webview_pro: ^3.0.1+4
   flutter_inappwebview: ^5.7.2+3  
 
-  permission_handler: ^10.2.0
-  geolocator: ^7.0.3
+  # permission_handler: ^10.2.0
+  # geolocator: ^7.0.3
 
-  url_launcher: ^6.1.11
+  # url_launcher: ^6.1.11
   connectivity_plus: ^3.0.3
-  percent_indicator: ^4.2.3
-  lottie: ^2.5.0
+  # percent_indicator: ^4.2.3
+  # lottie: ^2.5.0
 
   # google_mobile_ads: ^2.3.0
   # facebook_audience_network: ^1.0.1
 
-  flutter_launcher_icons: ^0.11.0
-  # flutter_native_splash: ^2.2.17
-  rename: ^2.1.1
+  # flutter_launcher_icons: ^0.11.0
+  flutter_native_splash: ^2.2.17
+  # rename: ^2.1.1
   # onesignal_flutter: ^3.5.1
 
 dev_dependencies:
@@ -70,7 +70,7 @@ flutter_icons:
 flutter_native_splash:
   # background_image: "assets/images/backgroundsplash.png"
   color: "#ffffff"
-  image: 'assets/images/splash.png'
+  image: 'assets/images/icon.png'
   android: true
   ios: true
 
@@ -80,7 +80,7 @@ flutter_native_splash:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  # flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

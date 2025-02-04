@@ -6,13 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:lottie/lottie.dart';
+// import 'package:permission_handler/permission_handler.dart';
+// import 'package:url_launcher/url_launcher.dart';
 import '../Controllers/errors_handling.dart';
 import '../chnages.dart';
-import '../main.dart';
 
 class Home extends StatefulWidget {
   Home({
@@ -140,6 +139,9 @@ class _HomeState extends State<Home> {
                 setState(() {
                   Changes.mainUrl = url?.toString() ?? '';
                   _isLoading = false;
+                  // _webViewController.evaluateJavascript(
+                  //     source:
+                  //         "document.getElementsByTagName('footer') [0].style.display='none'");
                 });
               },
               onProgressChanged: (controller, progress) {
@@ -172,6 +174,9 @@ class _HomeState extends State<Home> {
               initialOptions: InAppWebViewGroupOptions(
                   crossPlatform: InAppWebViewOptions(
                     cacheEnabled: true,
+                    userAgent:
+                        "Mozilla/5.O (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.O.4472.124 Safari/537.36",
+                    applicationNameForUserAgent: 'WebViewPro',
                     javaScriptEnabled: true,
                     useOnDownloadStart: true,
                     useShouldOverrideUrlLoading: true,
@@ -190,58 +195,58 @@ class _HomeState extends State<Home> {
 
               // Track if the website already asked for geolocation permission
 
-              androidOnGeolocationPermissionsShowPrompt:
-                  (controller, origin) async {
-                if (hasGeolocationPermission) {
-                  // The website already asked for geolocation permission, show the website's prompt
-                  return GeolocationPermissionShowPromptResponse(
-                      origin: origin, allow: true, retain: true);
-                } else {
-                  // The website is asking for geolocation permission for the first time, show the app's prompt
-                  var status = await Permission.locationWhenInUse.request();
-                  if (status.isGranted) {
-                    hasGeolocationPermission =
-                        true; // Remember that the website asked for geolocation permission
-                    return GeolocationPermissionShowPromptResponse(
-                        origin: origin, allow: true, retain: true);
-                  } else {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Location Permission Required'),
-                        content: Text(
-                            'This app needs access to your location to show it on the map.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              hasGeolocationPermission =
-                                  false; // Reset the permission status on cancel
-                              controller.evaluateJavascript(
-                                source:
-                                    'navigator.geolocation.getCurrentPosition = function(success, error) { error({code: 1}); };',
-                              );
-                            },
-                            child: Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              hasGeolocationPermission =
-                                  true; // Remember that the website asked for geolocation permission
-                              Geolocator
-                                  .openAppSettings(); // Redirect the user to app settings to manually enable location permission
-                            },
-                            child: Text('Open Settings'),
-                          ),
-                        ],
-                      ),
-                    );
-                    return GeolocationPermissionShowPromptResponse(
-                        origin: origin, allow: false, retain: true);
-                  }
-                }
-              },
+              // androidOnGeolocationPermissionsShowPrompt:
+              //     (controller, origin) async {
+              //   if (hasGeolocationPermission) {
+              //     // The website already asked for geolocation permission, show the website's prompt
+              //     return GeolocationPermissionShowPromptResponse(
+              //         origin: origin, allow: true, retain: true);
+              //   } else {
+              //     // The website is asking for geolocation permission for the first time, show the app's prompt
+              //     var status = await Permission.locationWhenInUse.request();
+              //     if (status.isGranted) {
+              //       hasGeolocationPermission =
+              //           true; // Remember that the website asked for geolocation permission
+              //       return GeolocationPermissionShowPromptResponse(
+              //           origin: origin, allow: true, retain: true);
+              //     } else {
+              //       showDialog(
+              //         context: context,
+              //         builder: (context) => AlertDialog(
+              //           title: Text('Location Permission Required'),
+              //           content: Text(
+              //               'This app needs access to your location to show it on the map.'),
+              //           actions: [
+              //             TextButton(
+              //               onPressed: () {
+              //                 Navigator.pop(context);
+              //                 hasGeolocationPermission =
+              //                     false; // Reset the permission status on cancel
+              //                 controller.evaluateJavascript(
+              //                   source:
+              //                       'navigator.geolocation.getCurrentPosition = function(success, error) { error({code: 1}); };',
+              //                 );
+              //               },
+              //               child: Text('Cancel'),
+              //             ),
+              //             TextButton(
+              //               onPressed: () {
+              //                 Navigator.pop(context);
+              //                 hasGeolocationPermission =
+              //                     true; // Remember that the website asked for geolocation permission
+              //                 Geolocator
+              //                     .openAppSettings(); // Redirect the user to app settings to manually enable location permission
+              //               },
+              //               child: Text('Open Settings'),
+              //             ),
+              //           ],
+              //         ),
+              //       );
+              //       return GeolocationPermissionShowPromptResponse(
+              //           origin: origin, allow: false, retain: true);
+              //     }
+              //   }
+              // },
 
               shouldOverrideUrlLoading: (controller, navigationAction) async {
                 setState(() {
@@ -254,25 +259,29 @@ class _HomeState extends State<Home> {
                 var uri = navigationAction.request.url;
                 if (uri!.toString().startsWith(Changes.startPointUrl)) {
                   return NavigationActionPolicy.ALLOW;
-                } else if (uri.toString().startsWith(Changes.makePhoneCallUrl)) {
+                } else if (uri
+                    .toString()
+                    .startsWith(Changes.makePhoneCallUrl)) {
                   if (kDebugMode) {
                     print('opening phone $uri');
                   }
-                  _makePhoneCall(uri.toString());
+                  // _makePhoneCall(uri.toString());
                   setState(() {
-                    _isLoading=false;
+                    _isLoading = false;
                   });
                   return NavigationActionPolicy.CANCEL;
                 } else if (uri.toString().startsWith(Changes.openWhatsAppUrl)) {
                   if (kDebugMode) {
                     print('opening WhatsApp $uri');
                   }
-                  _openWhatsApp('$uri');
-                   setState(() {
-                    _isLoading=false;
+                  // _openWhatsApp('$uri');
+                  setState(() {
+                    _isLoading = false;
                   });
                   return NavigationActionPolicy.CANCEL;
-                } else if (uri.toString().startsWith(Changes.blockNavigationUrl)) {
+                } else if (uri
+                    .toString()
+                    .startsWith(Changes.blockNavigationUrl)) {
                   if (kDebugMode) {
                     print('Blocking navigation to $uri');
                   }
@@ -284,9 +293,9 @@ class _HomeState extends State<Home> {
                   setState(() {
                     _isLoading = false;
                   });
-                  _launchExternalUrl(uri.toString());
+                  // _launchExternalUrl(uri.toString());
                   // You can handle other links here and decide how to navigate to them
-                  return NavigationActionPolicy.CANCEL;
+                  return NavigationActionPolicy.ALLOW;
                   // if (uri.toString() ==
                   //     'https://m.facebook.com/oauth/error/?error_code=PLATFORM__LOGIN_DISABLED_FROM_WEBVIEW_OLD_SDK_VERSION&display=touch') {
                   //   return NavigationActionPolicy.CANCEL;
@@ -358,37 +367,37 @@ class _HomeState extends State<Home> {
 //     }
 //   }
 
-  Future<void> _launchExternalUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url, forceSafariVC: false, forceWebView: false);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  // Future<void> _launchExternalUrl(String url) async {
+  //   if (await canLaunch(url)) {
+  //     await launch(url, forceSafariVC: false, forceWebView: false);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
-  void _openWhatsApp(String url) async {
-    // String url = 'https://wa.me/$phoneNumber';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  // void _openWhatsApp(String url) async {
+  //   // String url = 'https://wa.me/$phoneNumber';
+  //   if (await canLaunch(url)) {
+  //     await launch(url);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
-  void _makePhoneCall(String phoneNumber) async {
-    final telScheme = 'tel:';
-    if (phoneNumber.startsWith(telScheme)) {
-      if (await canLaunch(phoneNumber)) {
-        await launch(phoneNumber);
-      } else {
-        print('Could not launch $phoneNumber');
-        // Handle the error gracefully (e.g., show an error message to the user).
-      }
-    } else {
-      print('Invalid phone number format: $phoneNumber');
-      // Handle the error gracefully (e.g., show an error message to the user).
-    }
-  }
+  // void _makePhoneCall(String phoneNumber) async {
+  //   final telScheme = 'tel:';
+  //   if (phoneNumber.startsWith(telScheme)) {
+  //     if (await canLaunch(phoneNumber)) {
+  //       await launch(phoneNumber);
+  //     } else {
+  //       print('Could not launch $phoneNumber');
+  //       // Handle the error gracefully (e.g., show an error message to the user).
+  //     }
+  //   } else {
+  //     print('Invalid phone number format: $phoneNumber');
+  //     // Handle the error gracefully (e.g., show an error message to the user).
+  //   }
+  // }
 
   // // facebook add
   // void _loadBannerAdd() {

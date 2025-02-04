@@ -1,6 +1,5 @@
 import 'package:ezeehome_webview/Controllers/initlize_app.dart';
 import 'package:ezeehome_webview/Screens/Home.dart';
-import 'package:ezeehome_webview/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

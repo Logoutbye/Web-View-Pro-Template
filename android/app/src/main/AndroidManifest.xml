@@ -3,6 +3,8 @@
     <!-- Other manifest declarations -->
    <uses-permission android:name="android.permission.INTERNET"/>
    <!-- <uses-permission android:name="android.permission.CALL_PHONE"/> -->
+   <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+
    <queries>
     <!-- If your app checks for SMS support -->
     <intent>
@@ -26,7 +28,7 @@
    <uses-permission android:name="android.permission.AUDIO_CAPTURE" /> -->
    <!-- Add more permission entries as needed -->
    <application
-        android:label="Naija Chef Hub"
+        android:label="EarthRecordZ"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <!-- Add the service declaration for custom tabs support -->
